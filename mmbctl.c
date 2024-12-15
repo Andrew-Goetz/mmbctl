@@ -14,8 +14,12 @@
 #define BRIGHTNESS_FEATURE_CODE 0x10
 
 #define DDC_DIE(e) \
-    fprintf(stderr, "(%s:%s:%d) returned %d (%s): %s\n", \
-            __FILE__, __func__, __LINE__, e, \
+    fprintf(stderr, \
+            "(%s:%s:%d) returned %d (%s): %s\n", \
+            __FILE__, \
+            __func__, \
+            __LINE__, \
+            e, \
             ddca_rc_name(e), \
             ddca_rc_desc(e)); \
     exit(EXIT_FAILURE)
@@ -31,15 +35,16 @@ DDCA_Status set_continuous_value(
 int main(int argc, char *argv[])
 {
     if (argc <= 1) {
-        fprintf(
-            stderr,
-            "Usage: mmbctl n m ...\n"
-            "\n"
-            "Set brightness for monitor 1 to n and brightness for monitor 2 to m, where all values n, m, ... must be in the range [-1, 100].\n"
-            "\n"
-            "Specify a negative brightness to skip setting a monitor, for example:\n"
-            "\t# Set monitor 2 to 50%% brightness, monitor 3 to 100%% brightness, and skip monitor 1\n"
-            "\tmmbctl -1 50 100\n");
+        fprintf(stderr,
+                "# Set monitor 1 to 100%% brightness\n"
+                "mmbctl 100\n"
+                "\n"
+                "# Set monitor 2 to 0%% brightness (lowest brightness, not completely off),\n"
+                "# but leave monitor 1 untouched\n"
+                "mmbctl -1 0\n"
+                "\n"
+                "# Set monitor 1 to 50%% brightness, skip monitor 2, and set monitor 3 to max brightness\n"
+                "mmbctl 50 -1 100\n");
         exit(EXIT_FAILURE);
     }
 
@@ -59,15 +64,14 @@ int main(int argc, char *argv[])
         }
 
         const long brightness_value = strtol(argv[i + 1], NULL, 10);
-        if (brightness_value < 0) {
-            fprintf(stderr, "Encountered negative brighness for monitor %d, skipping.\n", i);
+        if (brightness_value == -1) {
+            fprintf(stderr, "Encountered -1 brightness for monitor %d, skipping.\n", i);
             continue;
-        } else if (brightness_value > 100) {
-            fprintf(
-                stderr,
-                "Error: valid brightness values must be in range [0-100], supplied %ld for monitor %d\n",
-                brightness_value,
-                i + 1);
+        } else if (brightness_value > 100 || brightness_value < -1) {
+            fprintf(stderr,
+                    "Error: valid brightness values must be in range [-1, 100], supplied %ld for monitor %d\n",
+                    brightness_value,
+                    i + 1);
             exit(EXIT_FAILURE);
         }
 

@@ -8,6 +8,5 @@ all:	$(TARGET)
 
 $(TARGET):	mmbctl.c
 
-.PHONY:	clean
 clean:
 	$(RM) $(TARGET)
