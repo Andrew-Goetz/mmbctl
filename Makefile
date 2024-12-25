@@ -1,5 +1,5 @@
 CC:=gcc
-CFLAGS:=-O2 -g -Wall -Wextra -std=c99
+CFLAGS:=-O3 -g -Wall -Wextra -std=c99
 LDLIBS:=-lddcutil
 
 TARGET:=mmbctl
